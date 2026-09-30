@@ -34,7 +34,11 @@ final class AppFactory
                 new VehicleAge((int) date('Y')),
             ),
             new LtvCalculator(),
-            new DecisionEngine($rules['ltv']),
+            new DecisionEngine([
+                'approve_max' => $rules['ltv']['approve_max'],
+                'review_max' => $rules['ltv']['review_max'],
+                'max_mileage_for_approve_km' => $rules['vehicle']['max_mileage_for_approve_km'],
+            ]),
             new VehicleAge((int) date('Y')),
         );
 
