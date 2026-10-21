@@ -33,3 +33,6 @@ docker-compose.override.yml
 
 # Kilo Code: копии репо для параллельных сессий (1.2.3) — не коммитим
 /.kilo/worktrees/
+
+# Playwright MCP: снимки страниц и логи консоли
+/.playwright-mcp/
