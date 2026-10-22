@@ -16,17 +16,20 @@ final class DecisionEngineTest extends TestCase
 
     protected function setUp(): void
     {
+        $rules = require __DIR__ . '/../../backend/config/rules.php';
+
         $this->engine = new DecisionEngine([
             'approve_max' => 60.0,
             'review_max' => 85.0,
             'max_mileage_for_approve_km' => self::MILEAGE_THRESHOLD,
+            'max_age_years' => $rules['vehicle']['max_age_years'],
         ]);
     }
 
     #[DataProvider('ltvValues')]
     public function testDecidesByLtv(float $ltv, string $expected): void
     {
-        self::assertSame($expected, $this->engine->decide($ltv, 0));
+        self::assertSame($expected, $this->engine->decide($ltv, 0, 0));
     }
 
     /** @return array<string,array{float,string}> */
@@ -45,7 +48,7 @@ final class DecisionEngineTest extends TestCase
     #[DataProvider('mileageValues')]
     public function testMileageThresholdWithLowLtv(int $mileage, string $expected): void
     {
-        self::assertSame($expected, $this->engine->decide(30.0, $mileage));
+        self::assertSame($expected, $this->engine->decide(30.0, $mileage, 0));
     }
 
     /** @return array<string,array{int,string}> */
@@ -60,16 +63,16 @@ final class DecisionEngineTest extends TestCase
 
     public function testRejectBeatsReviewWhenBothTriggersFire(): void
     {
-        self::assertSame(DecisionEngine::REJECT, $this->engine->decide(120.0, 400001));
+        self::assertSame(DecisionEngine::REJECT, $this->engine->decide(120.0, 400001, 0));
     }
 
     public function testLtvDrivesReviewWhenMileageAtThreshold(): void
     {
-        self::assertSame(DecisionEngine::REVIEW, $this->engine->decide(72.3, 400000));
+        self::assertSame(DecisionEngine::REVIEW, $this->engine->decide(72.3, 400000, 0));
     }
 
     public function testLtvDrivesRejectWhenMileageBelowThreshold(): void
     {
-        self::assertSame(DecisionEngine::REJECT, $this->engine->decide(120.0, 399999));
+        self::assertSame(DecisionEngine::REJECT, $this->engine->decide(120.0, 399999, 0));
     }
 }

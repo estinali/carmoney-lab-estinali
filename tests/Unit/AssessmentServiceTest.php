@@ -24,7 +24,10 @@ final class AssessmentServiceTest extends TestCase
         $rules = require __DIR__ . '/../../backend/config/rules.php';
         $age = new VehicleAge((int) date('Y'));
 
-        $thresholds = $rules['ltv'] + ['max_mileage_for_approve_km' => self::MILEAGE_THRESHOLD];
+        $thresholds = $rules['ltv'] + [
+            'max_mileage_for_approve_km' => self::MILEAGE_THRESHOLD,
+            'max_age_years' => $rules['vehicle']['max_age_years'],
+        ];
 
         $this->service = new AssessmentService(
             new ApplicationValidator($rules, new VinValidator($rules['vin']), $age),
@@ -35,11 +38,11 @@ final class AssessmentServiceTest extends TestCase
     }
 
     /** @return array<string,mixed> */
-    private function payload(int $amount, int $marketValue, ?int $mileage = 96000): array
+    private function payload(int $amount, int $marketValue, ?int $mileage = 96000, ?int $year = null): array
     {
         return [
             'vin' => 'XTA21099998765432',
-            'year' => (int) date('Y') - 4,
+            'year' => $year ?? (int) date('Y') - 4,
             'mileage' => $mileage,
             'market_value' => $marketValue,
             'requested_amount' => $amount,
@@ -71,6 +74,15 @@ final class AssessmentServiceTest extends TestCase
         $result = $this->service->assess($this->payload(855000, 900000));
 
         self::assertSame(95.0, $result['ltv']);
+        self::assertSame(DecisionEngine::REJECT, $result['decision']);
+        self::assertSame(0, $result['approved_limit']);
+    }
+
+    public function testRejectsVehicleOlderThanMaximumAgeDespiteLowLtv(): void
+    {
+        $result = $this->service->assess($this->payload(450000, 900000, 96000, (int) date('Y') - 21));
+
+        self::assertSame(50.0, $result['ltv']);
         self::assertSame(DecisionEngine::REJECT, $result['decision']);
         self::assertSame(0, $result['approved_limit']);
     }
