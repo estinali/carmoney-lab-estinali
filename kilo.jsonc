@@ -11,7 +11,7 @@
     "bash": { "*": "ask", "git *": "allow", "git push*": "ask", "make *": "allow", "*.env*": "deny", "*reset_db*": "deny", "rm -rf*": "deny", "git push --force*": "deny" }
   },
   "mcp": {
-    "playwright": { "type": "local", "command": ["npx", "@playwright/mcp@latest", "--headless"], "enabled": true }
-  },
-  "mobile": { "type": "local", "command": ["mcp-devices"], "enabled": true }
+    "playwright": { "type": "local", "command": ["npx", "@playwright/mcp@latest", "--headless"], "enabled": true },
+    "mobile": { "type": "local", "command": ["mcp-devices"], "enabled": true }
+  }  
 }
