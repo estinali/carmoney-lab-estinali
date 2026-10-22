@@ -12,5 +12,6 @@
   },
   "mcp": {
     "playwright": { "type": "local", "command": ["npx", "@playwright/mcp@latest", "--headless"], "enabled": true }
-  }
+  },
+  "mobile": { "type": "local", "command": ["mcp-devices"], "enabled": true }
 }
